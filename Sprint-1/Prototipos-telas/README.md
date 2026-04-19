@@ -39,7 +39,7 @@ Tela destinada ao cadastro de residências disponíveis para hospedagem.
 ## Cadastro de Quarto
 
 <p align="center">
-  <img src="imagens/cadastro_quarto.jpeg" width="40%"/>
+  <img src="" width="40%"/>
 </p>
 
 Tela para cadastro de quartos, incluindo tipo, valor da diária e adicionais.
@@ -49,7 +49,7 @@ Tela para cadastro de quartos, incluindo tipo, valor da diária e adicionais.
 ## Listagem de Quartos
 
 <p align="center">
-  <img src="imagens/listagem_quarto.jpeg" width="80%"/>
+  <img src="" width="80%"/>
 </p>
 
 Tela que apresenta os quartos disponíveis para reserva.
