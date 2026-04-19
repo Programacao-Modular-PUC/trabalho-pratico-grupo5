@@ -29,7 +29,7 @@ Tela utilizada para o cadastro de novos clientes, contendo informações pessoai
 ## Cadastro de Residência
 
 <p align="center">
-  <img src="imagens/cadastro_residencia.jpeg" width="40%"/>
+  <img src="" width="40%"/>
 </p>
 
 Tela destinada ao cadastro de residências disponíveis para hospedagem.
@@ -80,7 +80,7 @@ Tela que exibe o cálculo das diárias e o valor total da reserva.
 ## Recibo
 
 <p align="center">
-  <img src="imagens/recibo.jpeg" width="40%"/>
+  <img src="" width="40%"/>
 </p>
 
 Tela que apresenta o comprovante do pagamento da hospedagem.
@@ -90,7 +90,7 @@ Tela que apresenta o comprovante do pagamento da hospedagem.
 ## Histórico de Hospedagens
 
 <p align="center">
-  <img src="imagens/historico_hosp.jpeg" width="40%"/>
+  <img src="" width="40%"/>
 </p>
 
 Tela que exibe o histórico de reservas realizadas pelo sistema.
