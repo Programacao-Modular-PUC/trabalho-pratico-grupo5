@@ -1,8 +1,5 @@
 # Protótipos de Telas
 
-Este documento apresenta os protótipos de interface do sistema de hospedagem desenvolvidos na Sprint 1.  
-As telas representam o fluxo principal do sistema, sem implementação de funcionalidades.
-
 ---
 
 ## Tela de Login
