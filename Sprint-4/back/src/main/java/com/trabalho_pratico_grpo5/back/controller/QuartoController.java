@@ -30,13 +30,8 @@ public class QuartoController {
     }
  
     @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<?> filtrarPorTipo(@PathVariable String tipo) {
-        try {
-            List<Quarto> quartos = quartoService.filtrarPorTipo(tipo);
-            return ResponseEntity.ok(quartos);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<List<Quarto>> filtrarPorTipo(@PathVariable String tipo) {
+        return ResponseEntity.ok(quartoService.filtrarPorTipo(tipo));
     }
  
     @GetMapping("/{id}")

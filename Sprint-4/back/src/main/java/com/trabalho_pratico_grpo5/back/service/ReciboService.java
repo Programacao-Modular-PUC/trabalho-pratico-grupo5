@@ -22,6 +22,10 @@ public class ReciboService {
         if (recibo == null) {
             throw new IllegalArgumentException("Recibo não pode ser nulo.");
         }
+        if (recibo.getAluguel() != null && recibo.getAluguel().getId() != null
+                && reciboRepository.existsByAluguelId(recibo.getAluguel().getId())) {
+            throw new IllegalStateException("Este aluguel já possui um recibo emitido.");
+        }
         return reciboRepository.save(recibo);
     }
  

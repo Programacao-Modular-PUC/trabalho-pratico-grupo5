@@ -1,9 +1,17 @@
 package com.trabalho_pratico_grpo5.back.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "tipo")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = QuartoIndividual.class, name = "individual"),
+        @JsonSubTypes.Type(value = QuartoDuplo.class, name = "duplo"),
+        @JsonSubTypes.Type(value = QuartoFamilia.class, name = "familia")
+})
 public abstract class Quarto {
 
     @Id
@@ -19,6 +27,10 @@ public abstract class Quarto {
     protected boolean disponivel = true;
     
     public abstract double verificarPrecoFinal();
+
+    public double getPrecoFinal() {
+        return verificarPrecoFinal();
+    }
 
     public Long getId() {
         return id;

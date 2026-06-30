@@ -2,12 +2,32 @@ package com.trabalho_pratico_grpo5.back.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
- 
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
- 
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleMessageNotReadable(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        while (cause != null) {
+            if (cause instanceof QuartoIndisponivelException) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(cause.getMessage());
+            }
+            if (cause instanceof CapacidadeExcedidaException
+                    || cause instanceof DataInvalidaException
+                    || cause instanceof RecursoNaoPermitidoException
+                    || cause instanceof IllegalStateException
+                    || cause instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(cause.getMessage());
+            }
+            cause = cause.getCause();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Corpo da requisição inválido ou malformado.");
+    }
+
     @ExceptionHandler(QuartoIndisponivelException.class)
     public ResponseEntity<String> handleQuartoIndisponivel(QuartoIndisponivelException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());

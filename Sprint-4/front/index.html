@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DJFinance — Sistema de Hospedagem</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --card:      #22263a;
+      --border:    #2e3350;
+      --accent:    #6c63ff;
+      --accent2:   #4fd1c5;
+      --danger:    #e05252;
+      --success:   #48bb78;
+      --text:      #e2e8f0;
+      --muted:     #8892b0;
+      --radius:    10px;
+      --shadow:    0 4px 24px rgba(0,0,0,.45);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -.5px;
+    }
+    header .logo span { color: var(--accent2); }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      gap: .25rem;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+    nav button {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: .45rem .9rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: .85rem;
+      transition: background .15s, color .15s;
+    }
+    nav button:hover, nav button.active {
+      background: var(--card);
+      color: var(--text);
+    }
+    nav button.active { color: var(--accent); font-weight: 600; }
+
+    /* ── Layout ── */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-left: .75rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+      font-size: .8rem;
+      color: var(--muted);
+    }
+    label span { font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    input, select, textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: .5rem .75rem;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .55rem 1.1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-danger  { background: var(--danger);  color: #fff; }
+    .btn-warn    { background: #d97706;         color: #fff; }
+    .btn-success { background: var(--success);  color: #fff; }
+    .btn-ghost   { background: var(--border);   color: var(--text); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    th {
+      background: var(--surface);
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: .75rem;
+      letter-spacing: .06em;
+      padding: .6rem .9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: .65rem .9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.025); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .badge-green  { background: rgba(72,187,120,.2); color: var(--success); }
+    .badge-red    { background: rgba(224,82,82,.2);  color: var(--danger); }
+    .badge-purple { background: rgba(108,99,255,.2); color: var(--accent); }
+    .badge-teal   { background: rgba(79,209,197,.2); color: var(--accent2); }
+
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      z-index: 9999;
+    }
+    .toast {
+      padding: .75rem 1.2rem;
+      border-radius: var(--radius);
+      font-size: .875rem;
+      font-weight: 500;
+      box-shadow: var(--shadow);
+      animation: slideIn .25s ease;
+      max-width: 320px;
+    }
+    .toast-ok  { background: #1a3a2a; border-left: 4px solid var(--success); color: var(--success); }
+    .toast-err { background: #3a1a1a; border-left: 4px solid var(--danger);  color: var(--danger); }
+    @keyframes slideIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: none; } }
+
+    /* ── Checkbox group ── */
+    .check-group {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .check-group label {
+      flex-direction: row;
+      align-items: center;
+      gap: .4rem;
+      font-size: .88rem;
+      color: var(--text);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .check-group input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+
+    /* ── Pacote result ── */
+    #pacote-result, #pacote-aluguel-result {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      display: none;
+    }
+    #pacote-result .descricao, #pacote-aluguel-result .descricao { color: var(--muted); font-size: .9rem; margin-bottom: .5rem; }
+    #pacote-result .preco, #pacote-aluguel-result .preco { font-size: 1.5rem; font-weight: 700; color: var(--accent2); }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    /* ── Row actions ── */
+    .actions { display: flex; gap: .4rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Hospedagem<span>Pro</span></div>
+  <nav id="nav">
+    <button class="active" data-section="clientes">Clientes</button>
+    <button data-section="residencias">Residências</button>
+    <button data-section="quartos">Quartos</button>
+    <button data-section="alugueis">Aluguéis</button>
+    <button data-section="recibos">Recibos</button>
+    <button data-section="pacotes">Montagem de Pacote</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ═══════════════════ CLIENTES ═══════════════════ -->
+  <section id="clientes" class="section active">
+    <h2>Clientes</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>Nome</span><input id="c-nome" placeholder="Nome completo" /></label>
+        <label><span>CPF</span><input id="c-cpf" placeholder="000.000.000-00" /></label>
+        <label><span>E-mail</span><input id="c-email" type="email" placeholder="email@exemplo.com" /></label>
+        <label><span>Telefone</span><input id="c-telefone" placeholder="(00) 00000-0000" /></label>
+        <label><span>Data de Nascimento</span><input id="c-dataNascimento" type="date" /></label>
+        <label><span>Endereço</span><input id="c-endereco" placeholder="Rua, número, bairro" /></label>
+      </div>
+      <button class="btn btn-primary" onclick="criarCliente()">➕ Cadastrar Cliente</button>
+    </div>
+    <div class="card table-wrap">
+      <table id="clientes-table">
+        <thead><tr><th>#</th><th>Nome</th><th>CPF</th><th>E-mail</th><th>Telefone</th><th>Ações</th></tr></thead>
+        <tbody><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ RESIDÊNCIAS ═══════════════════ -->
+  <section id="residencias" class="section">
+    <h2>Residências</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>Endereço</span><input id="r-endereco" placeholder="Rua, número, cidade" /></label>
+        <label><span>Qtd. Quartos</span><input id="r-quantidadeQuartos" type="number" min="1" placeholder="1" /></label>
+        <label><span>Disponível</span>
+          <select id="r-disponibilidade">
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn btn-primary" onclick="criarResidencia()">➕ Cadastrar Residência</button>
+    </div>
+    <div class="card table-wrap">
+      <table id="residencias-table">
+        <thead><tr><th>#</th><th>Endereço</th><th>Qtd. Quartos</th><th>Disponível</th><th>Ações</th></tr></thead>
+        <tbody><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ QUARTOS ═══════════════════ -->
+  <section id="quartos" class="section">
+    <h2>Quartos</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>Tipo</span>
+          <select id="q-tipo" onchange="atualizarCamposQuarto()">
+            <option value="individual">Individual</option>
+            <option value="duplo">Duplo</option>
+            <option value="familia">Família</option>
+          </select>
+        </label>
+        <label><span>Diária Base (R$)</span><input id="q-valorDiariaBase" type="number" min="0" placeholder="150.00" /></label>
+        <label><span>Ar-condicionado</span>
+          <select id="q-possuiAC"><option value="true">Sim</option><option value="false">Não</option></select>
+        </label>
+        <label><span>Hidromassagem</span>
+          <select id="q-possuiHidro"><option value="false">Não</option><option value="true">Sim</option></select>
+        </label>
+      </div>
+
+      <!-- Individual -->
+      <div id="campos-individual" class="form-grid">
+        <label><span>Camas Solteiro</span><input id="q-quantidadeCamasSolteiro" type="number" min="1" placeholder="1" /></label>
+        <label><span>Limite Hóspedes</span><input id="q-limiteHospedes" type="number" min="1" placeholder="1" /></label>
+      </div>
+
+      <!-- Duplo -->
+      <div id="campos-duplo" class="form-grid" style="display:none">
+        <label><span>Tipo de Cama</span>
+          <select id="q-tipoCama">
+            <option value="solteiro">Solteiro</option>
+            <option value="queen">Queen</option>
+            <option value="king">King</option>
+          </select>
+        </label>
+        <label><span>Hóspedes</span><input id="q-quantidadeHospedes-duplo" type="number" min="1" max="2" placeholder="2" /></label>
+        <label><span>Berço</span>
+          <select id="q-possuiBerco-duplo"><option value="false">Não</option><option value="true">Sim</option></select>
+        </label>
+      </div>
+
+      <!-- Família -->
+      <div id="campos-familia" class="form-grid" style="display:none">
+        <label><span>Hóspedes</span><input id="q-quantidadeHospedes-familia" type="number" min="1" max="10" placeholder="4" /></label>
+        <label><span>Ambientes</span><input id="q-quantidadeAmbientes" type="number" min="1" placeholder="2" /></label>
+        <label><span>Camas Solteiro</span><input id="q-camasSolteiro" type="number" min="0" placeholder="2" /></label>
+        <label><span>Camas Casal</span><input id="q-camasCasal" type="number" min="0" placeholder="1" /></label>
+        <label><span>Camas Queen/King</span><input id="q-camasQueenKing" type="number" min="0" placeholder="0" /></label>
+      </div>
+
+      <button class="btn btn-primary" onclick="criarQuarto()" style="margin-top:.5rem">➕ Cadastrar Quarto</button>
+    </div>
+
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="carregarQuartos()">Todos</button>
+      <button class="btn btn-ghost" onclick="carregarQuartosDisponiveis()">Disponíveis</button>
+      <button class="btn btn-ghost" onclick="filtrarQuartos('individual')">Individual</button>
+      <button class="btn btn-ghost" onclick="filtrarQuartos('duplo')">Duplo</button>
+      <button class="btn btn-ghost" onclick="filtrarQuartos('familia')">Família</button>
+    </div>
+
+    <div class="card table-wrap">
+      <table id="quartos-table">
+        <thead><tr><th>#</th><th>Tipo</th><th>Diária Base</th><th>Preço Final</th><th>AC</th><th>Hidro</th><th>Disponível</th><th>Ações</th></tr></thead>
+        <tbody><tr><td colspan="8" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ALUGUÉIS ═══════════════════ -->
+  <section id="alugueis" class="section">
+    <h2>Aluguéis</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>ID do Cliente</span><input id="a-clienteId" type="number" min="1" placeholder="1" /></label>
+        <label><span>ID do Quarto</span><input id="a-quartoId" type="number" min="1" placeholder="1" /></label>
+        <label><span>ID da Residência</span><input id="a-residenciaId" type="number" min="1" placeholder="1" /></label>
+        <label><span>Data Início</span><input id="a-dataInicio" type="date" /></label>
+        <label><span>Data Fim</span><input id="a-dataFim" type="date" /></label>
+        <label><span>Valor Total (R$)</span><input id="a-valorTotal" type="number" min="0" placeholder="0.00" /></label>
+      </div>
+      <button class="btn btn-primary" onclick="criarAluguel()">➕ Criar Aluguel</button>
+    </div>
+
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="carregarAlugueis()">Todos os Aluguéis</button>
+      <span style="color:var(--muted);font-size:.85rem">ou buscar por cliente:</span>
+      <input id="a-buscar-clienteId" type="number" placeholder="ID do cliente" style="width:130px;padding:.4rem .7rem" />
+      <button class="btn btn-ghost" onclick="buscarHistorico()">🔍 Histórico</button>
+    </div>
+
+    <div class="card table-wrap">
+      <table id="alugueis-table">
+        <thead><tr><th>#</th><th>Cliente</th><th>Quarto</th><th>Início</th><th>Fim</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody><tr><td colspan="8" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.05rem">Montar Pacote para um Aluguel</h2>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem">Usa o preço final já calculado do quarto do aluguel (verificarPrecoFinal) como base do pacote.</p>
+      <div class="form-grid">
+        <label><span>ID do Aluguel</span><input id="ap-aluguelId" type="number" min="1" placeholder="1" /></label>
+      </div>
+      <div class="check-group">
+        <label><input type="checkbox" class="ap-servico" value="cafe" /> ☕ Café da Manhã (+R$35)</label>
+        <label><input type="checkbox" class="ap-servico" value="lavanderia" /> 👕 Lavanderia (+R$45)</label>
+        <label><input type="checkbox" class="ap-servico" value="transporte" /> 🚌 Transporte (+R$60)</label>
+        <label><input type="checkbox" class="ap-servico" value="passeio" /> 🗺️ Passeio Turístico (+R$90)</label>
+      </div>
+      <button class="btn btn-success" onclick="montarPacoteAluguel()" style="margin-top:1rem">📦 Montar Pacote do Aluguel</button>
+      <div id="pacote-aluguel-result">
+        <div class="descricao" id="pacote-aluguel-desc"></div>
+        <div class="preco" id="pacote-aluguel-preco"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ RECIBOS ═══════════════════ -->
+  <section id="recibos" class="section">
+    <h2>Recibos</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>ID do Aluguel</span><input id="rec-aluguelId" type="number" min="1" placeholder="1" /></label>
+        <label><span>Valor Total (R$)</span><input id="rec-valorTotal" type="number" min="0" placeholder="0.00" /></label>
+      </div>
+      <button class="btn btn-primary" onclick="criarRecibo()">➕ Gerar Recibo</button>
+    </div>
+    <div class="card table-wrap">
+      <table id="recibos-table">
+        <thead><tr><th>#</th><th>Aluguel</th><th>Valor Total</th><th>Ações</th></tr></thead>
+        <tbody><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PACOTES ═══════════════════ -->
+  <section id="pacotes" class="section">
+    <h2>Montagem de Pacote</h2>
+    <div class="card">
+      <div class="form-grid">
+        <label><span>Diária Base (R$)</span><input id="p-precoDiaria" type="number" min="0" placeholder="200.00" /></label>
+      </div>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem">Selecione os serviços adicionais:</p>
+      <div class="check-group">
+        <label><input type="checkbox" value="cafe" /> ☕ Café da Manhã (+R$35)</label>
+        <label><input type="checkbox" value="lavanderia" /> 👕 Lavanderia (+R$45)</label>
+        <label><input type="checkbox" value="transporte" /> 🚌 Transporte (+R$60)</label>
+        <label><input type="checkbox" value="passeio" /> 🗺️ Passeio Turístico (+R$90)</label>
+      </div>
+      <button class="btn btn-success" onclick="montarPacote()" style="margin-top:1rem">📦 Montar Pacote</button>
+      <div id="pacote-result">
+        <div class="descricao" id="pacote-desc"></div>
+        <div class="preco" id="pacote-preco"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast-container"></div>
+
+<script>
+const API = 'http://localhost:8080/api';
+
+// ── Utils ──────────────────────────────────────────────────────────
+function toast(msg, ok = true) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (ok ? 'toast-ok' : 'toast-err');
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt || res.statusText);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function tableError(tableId, colspan) {
+  const tbody = document.querySelector('#' + tableId + ' tbody');
+  if (tbody) tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty">Não foi possível carregar os dados. Verifique se o backend está rodando em localhost:8080.</td></tr>`;
+}
+
+function fmt(v) { return v != null ? v : '—'; }
+function fmtBool(v) {
+  return v
+    ? '<span class="badge badge-green">Sim</span>'
+    : '<span class="badge badge-red">Não</span>';
+}
+function fmtMoeda(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+function tipoQuarto(q) {
+  const badges = {
+    individual: '<span class="badge badge-purple">Individual</span>',
+    duplo:      '<span class="badge badge-teal">Duplo</span>',
+    familia:    '<span class="badge badge-green">Família</span>',
+  };
+  return badges[q.tipo] || '<span class="badge badge-red">Desconhecido</span>';
+}
+
+// ── Nav ────────────────────────────────────────────────────────────
+document.getElementById('nav').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-section]');
+  if (!btn) return;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  const sec = document.getElementById(btn.dataset.section);
+  sec.classList.add('active');
+  sec._loaded || loadSection(btn.dataset.section);
+});
+
+function loadSection(name) {
+  const loaders = {
+    clientes:   carregarClientes,
+    residencias: carregarResidencias,
+    quartos:    carregarQuartos,
+    alugueis:   carregarAlugueis,
+    recibos:    carregarRecibos,
+  };
+  if (loaders[name]) { loaders[name](); document.getElementById(name)._loaded = true; }
+}
+
+// ── CLIENTES ───────────────────────────────────────────────────────
+async function carregarClientes() {
+  try {
+    const data = await api('/clientes');
+    renderClientes(data);
+  } catch(e) { toast(e.message, false); tableError('clientes-table', 6); }
+}
+
+function renderClientes(data) {
+  const tbody = document.querySelector('#clientes-table tbody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum cliente cadastrado.</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${fmt(c.nome)}</td>
+      <td>${fmt(c.cpf)}</td>
+      <td>${fmt(c.email)}</td>
+      <td>${fmt(c.telefone)}</td>
+      <td class="actions">
+        <button class="btn btn-danger" onclick="deletarCliente(${c.id})">🗑</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function criarCliente() {
+  const body = {
+    nome: document.getElementById('c-nome').value.trim(),
+    cpf: document.getElementById('c-cpf').value.trim(),
+    email: document.getElementById('c-email').value.trim(),
+    telefone: document.getElementById('c-telefone').value.trim(),
+    dataNascimento: document.getElementById('c-dataNascimento').value || null,
+    endereco: document.getElementById('c-endereco').value.trim(),
+  };
+  if (!body.nome || !body.cpf) { toast('Nome e CPF são obrigatórios.', false); return; }
+  try {
+    await api('/clientes', 'POST', body);
+    toast('Cliente cadastrado com sucesso!');
+    ['c-nome','c-cpf','c-email','c-telefone','c-dataNascimento','c-endereco'].forEach(id => document.getElementById(id).value = '');
+    carregarClientes();
+  } catch(e) { toast(e.message, false); }
+}
+
+async function deletarCliente(id) {
+  if (!confirm('Excluir cliente #' + id + '?')) return;
+  try { await api('/clientes/' + id, 'DELETE'); toast('Cliente excluído.'); carregarClientes(); }
+  catch(e) { toast(e.message, false); }
+}
+
+// ── RESIDÊNCIAS ────────────────────────────────────────────────────
+async function carregarResidencias() {
+  try {
+    const data = await api('/residencias');
+    const tbody = document.querySelector('#residencias-table tbody');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma residência cadastrada.</td></tr>'; return; }
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td>${r.id}</td>
+        <td>${fmt(r.endereco)}</td>
+        <td>${fmt(r.quantidadeQuartos)}</td>
+        <td>${fmtBool(r.disponibilidade)}</td>
+        <td class="actions">
+          <button class="btn btn-danger" onclick="deletarResidencia(${r.id})">🗑</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) { toast(e.message, false); tableError('residencias-table', 5); }
+}
+
+async function criarResidencia() {
+  const body = {
+    endereco: document.getElementById('r-endereco').value.trim(),
+    quantidadeQuartos: parseInt(document.getElementById('r-quantidadeQuartos').value) || 1,
+    disponibilidade: document.getElementById('r-disponibilidade').value === 'true',
+  };
+  if (!body.endereco) { toast('Endereço é obrigatório.', false); return; }
+  try {
+    await api('/residencias', 'POST', body);
+    toast('Residência cadastrada!');
+    document.getElementById('r-endereco').value = '';
+    carregarResidencias();
+  } catch(e) { toast(e.message, false); }
+}
+
+async function deletarResidencia(id) {
+  if (!confirm('Excluir residência #' + id + '?')) return;
+  try { await api('/residencias/' + id, 'DELETE'); toast('Residência excluída.'); carregarResidencias(); }
+  catch(e) { toast(e.message, false); }
+}
+
+// ── QUARTOS ────────────────────────────────────────────────────────
+function atualizarCamposQuarto() {
+  const tipo = document.getElementById('q-tipo').value;
+  document.getElementById('campos-individual').style.display = tipo === 'individual' ? '' : 'none';
+  document.getElementById('campos-duplo').style.display      = tipo === 'duplo'      ? '' : 'none';
+  document.getElementById('campos-familia').style.display    = tipo === 'familia'    ? '' : 'none';
+}
+
+async function carregarQuartos() {
+  try { renderQuartos(await api('/quartos')); }
+  catch(e) { toast(e.message, false); tableError('quartos-table', 8); }
+}
+
+async function carregarQuartosDisponiveis() {
+  try { renderQuartos(await api('/quartos/disponiveis')); }
+  catch(e) { toast(e.message, false); tableError('quartos-table', 8); }
+}
+
+async function filtrarQuartos(tipo) {
+  try { renderQuartos(await api('/quartos/tipo/' + tipo)); }
+  catch(e) { toast(e.message, false); tableError('quartos-table', 8); }
+}
+
+function renderQuartos(data) {
+  const tbody = document.querySelector('#quartos-table tbody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum quarto encontrado.</td></tr>'; return; }
+  tbody.innerHTML = data.map(q => `
+    <tr>
+      <td>${q.id}</td>
+      <td>${tipoQuarto(q)}</td>
+      <td>${fmtMoeda(q.valorDiariaBase)}</td>
+      <td>${fmtMoeda(q.precoFinal ?? q.valorDiariaBase)}</td>
+      <td>${fmtBool(q.possuiAC)}</td>
+      <td>${fmtBool(q.possuiHidro)}</td>
+      <td>${fmtBool(q.disponivel)}</td>
+      <td class="actions">
+        <button class="btn btn-danger" onclick="deletarQuarto(${q.id})">🗑</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function criarQuarto() {
+  const tipo = document.getElementById('q-tipo').value;
+  const base = {
+    valorDiariaBase: parseFloat(document.getElementById('q-valorDiariaBase').value) || 0,
+    possuiAC:    document.getElementById('q-possuiAC').value === 'true',
+    possuiHidro: document.getElementById('q-possuiHidro').value === 'true',
+    disponivel: true,
+  };
+
+  let body = {};
+  if (tipo === 'individual') {
+    body = { ...base,
+      quantidadeCamasSolteiro: parseInt(document.getElementById('q-quantidadeCamasSolteiro').value) || 1,
+      limiteHospedes: parseInt(document.getElementById('q-limiteHospedes').value) || 1,
+      possuiBerco: false,
+    };
+  } else if (tipo === 'duplo') {
+    body = { ...base,
+      tipoCama: document.getElementById('q-tipoCama').value,
+      quantidadeHospedes: parseInt(document.getElementById('q-quantidadeHospedes-duplo').value) || 2,
+      possuiBerco: document.getElementById('q-possuiBerco-duplo').value === 'true',
+    };
+  } else {
+    body = { ...base,
+      quantidadeHospedes: parseInt(document.getElementById('q-quantidadeHospedes-familia').value) || 4,
+      quantidadeAmbientes: parseInt(document.getElementById('q-quantidadeAmbientes').value) || 1,
+      camasSolteiro: parseInt(document.getElementById('q-camasSolteiro').value) || 0,
+      camasCasal: parseInt(document.getElementById('q-camasCasal').value) || 0,
+      camasQueenKing: parseInt(document.getElementById('q-camasQueenKing').value) || 0,
+    };
+  }
+
+  // Spring precisa do discriminador de tipo para JOINED inheritance
+  body.tipo = tipo;
+
+  try {
+    await api('/quartos', 'POST', body);
+    toast('Quarto cadastrado!');
+    carregarQuartos();
+  } catch(e) { toast(e.message, false); }
+}
+
+async function deletarQuarto(id) {
+  if (!confirm('Excluir quarto #' + id + '?')) return;
+  try { await api('/quartos/' + id, 'DELETE'); toast('Quarto excluído.'); carregarQuartos(); }
+  catch(e) { toast(e.message, false); }
+}
+
+// ── ALUGUÉIS ───────────────────────────────────────────────────────
+async function carregarAlugueis() {
+  try { renderAlugueis(await api('/alugueis')); }
+  catch(e) { toast(e.message, false); tableError('alugueis-table', 8); }
+}
+
+async function buscarHistorico() {
+  const id = document.getElementById('a-buscar-clienteId').value;
+  if (!id) { carregarAlugueis(); return; }
+  try { renderAlugueis(await api('/alugueis/cliente/' + id + '/historico')); }
+  catch(e) { toast(e.message, false); tableError('alugueis-table', 8); }
+}
+
+function renderAlugueis(data) {
+  const tbody = document.querySelector('#alugueis-table tbody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum aluguel encontrado.</td></tr>'; return; }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td>${a.id}</td>
+      <td>${a.cliente ? a.cliente.id : '—'}</td>
+      <td>${a.quarto ? a.quarto.id : '—'}</td>
+      <td>${fmt(a.dataInicio)}</td>
+      <td>${fmt(a.dataFim)}</td>
+      <td>${fmtMoeda(a.valorTotal)}</td>
+      <td>${a.cancelado
+        ? '<span class="badge badge-red">Cancelado</span>'
+        : '<span class="badge badge-green">Ativo</span>'}</td>
+      <td class="actions">
+        ${!a.cancelado ? `<button class="btn btn-warn" onclick="cancelarAluguel(${a.id})">⛔ Cancelar</button>` : ''}
+        <button class="btn btn-danger" onclick="deletarAluguel(${a.id})">🗑</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function criarAluguel() {
+  const clienteId   = parseInt(document.getElementById('a-clienteId').value);
+  const quartoId    = parseInt(document.getElementById('a-quartoId').value);
+  const residenciaId= parseInt(document.getElementById('a-residenciaId').value);
+  const dataInicio  = document.getElementById('a-dataInicio').value;
+  const dataFim     = document.getElementById('a-dataFim').value;
+  const valorTotal  = parseFloat(document.getElementById('a-valorTotal').value) || 0;
+
+  if (!clienteId || !dataInicio || !dataFim) { toast('Cliente, data início e data fim são obrigatórios.', false); return; }
+
+  try {
+    // Quarto é polimórfico (JOINED inheritance) — o discriminador "tipo" precisa
+    // vir junto na referência, então buscamos o quarto real antes de montar o body.
+    let quartoRef = null;
+    if (quartoId) {
+      const quarto = await api('/quartos/' + quartoId);
+      quartoRef = { id: quarto.id, tipo: quarto.tipo };
+    }
+    const body = {
+      dataInicio,
+      dataFim,
+      valorTotal,
+      cliente: { id: clienteId },
+      quarto: quartoRef,
+      residencia: residenciaId ? { id: residenciaId } : null,
+    };
+    await api('/alugueis', 'POST', body);
+    toast('Aluguel criado com sucesso!');
+    carregarAlugueis();
+  } catch(e) { toast(e.message, false); }
+}
+
+async function cancelarAluguel(id) {
+  if (!confirm('Cancelar aluguel #' + id + '?')) return;
+  try { await api('/alugueis/' + id + '/cancelar', 'PATCH'); toast('Aluguel cancelado.'); carregarAlugueis(); }
+  catch(e) { toast(e.message, false); }
+}
+
+async function montarPacoteAluguel() {
+  const aluguelId = parseInt(document.getElementById('ap-aluguelId').value);
+  if (!aluguelId) { toast('Informe o ID do aluguel.', false); return; }
+  const servicos = [...document.querySelectorAll('.ap-servico:checked')].map(cb => cb.value);
+  try {
+    const res = await api('/alugueis/' + aluguelId + '/pacote', 'POST', { servicos });
+    document.getElementById('pacote-aluguel-desc').textContent  = res.descricao;
+    document.getElementById('pacote-aluguel-preco').textContent = fmtMoeda(res.precoTotal);
+    document.getElementById('pacote-aluguel-result').style.display = 'block';
+  } catch(e) { toast(e.message, false); }
+}
+
+async function deletarAluguel(id) {
+  if (!confirm('Excluir aluguel #' + id + '?')) return;
+  try { await api('/alugueis/' + id, 'DELETE'); toast('Aluguel excluído.'); carregarAlugueis(); }
+  catch(e) { toast(e.message, false); }
+}
+
+// ── RECIBOS ────────────────────────────────────────────────────────
+async function carregarRecibos() {
+  try {
+    const data = await api('/recibos');
+    const tbody = document.querySelector('#recibos-table tbody');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum recibo gerado.</td></tr>'; return; }
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td>${r.idRecibo}</td>
+        <td>${r.aluguel ? r.aluguel.id : '—'}</td>
+        <td>${fmtMoeda(r.valorTotal)}</td>
+        <td class="actions">
+          <button class="btn btn-danger" onclick="deletarRecibo(${r.idRecibo})">🗑</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) { toast(e.message, false); tableError('recibos-table', 4); }
+}
+
+async function criarRecibo() {
+  const aluguelId  = parseInt(document.getElementById('rec-aluguelId').value);
+  const valorTotal = parseFloat(document.getElementById('rec-valorTotal').value) || 0;
+  if (!aluguelId) { toast('ID do aluguel é obrigatório.', false); return; }
+  try {
+    await api('/recibos', 'POST', { valorTotal, aluguel: { id: aluguelId } });
+    toast('Recibo gerado!');
+    carregarRecibos();
+  } catch(e) { toast(e.message, false); }
+}
+
+async function deletarRecibo(id) {
+  if (!confirm('Excluir recibo #' + id + '?')) return;
+  try { await api('/recibos/' + id, 'DELETE'); toast('Recibo excluído.'); carregarRecibos(); }
+  catch(e) { toast(e.message, false); }
+}
+
+// ── PACOTES ────────────────────────────────────────────────────────
+async function montarPacote() {
+  const precoDiaria = parseFloat(document.getElementById('p-precoDiaria').value);
+  if (!precoDiaria || precoDiaria <= 0) { toast('Informe a diária base.', false); return; }
+  const servicos = [...document.querySelectorAll('.check-group input[type=checkbox]:checked')]
+    .map(cb => cb.value);
+  try {
+    const res = await api('/pacotes/montar', 'POST', { precoDiaria, servicos });
+    document.getElementById('pacote-desc').textContent  = res.descricao;
+    document.getElementById('pacote-preco').textContent = fmtMoeda(res.precoTotal);
+    document.getElementById('pacote-result').style.display = 'block';
+  } catch(e) { toast(e.message, false); }
+}
+
+// ── Init ───────────────────────────────────────────────────────────
+carregarClientes();
+</script>
+</body>
+</html>

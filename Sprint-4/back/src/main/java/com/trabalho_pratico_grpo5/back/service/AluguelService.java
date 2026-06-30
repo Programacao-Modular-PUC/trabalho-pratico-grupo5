@@ -3,24 +3,29 @@ package com.trabalho_pratico_grpo5.back.service;
 import com.trabalho_pratico_grpo5.back.exception.QuartoIndisponivelException;
 import com.trabalho_pratico_grpo5.back.exception.DataInvalidaException;
 import com.trabalho_pratico_grpo5.back.model.Aluguel;
+import com.trabalho_pratico_grpo5.back.model.Quarto;
 import com.trabalho_pratico_grpo5.back.notification.GerenciadorDeNotificacoes;
 import com.trabalho_pratico_grpo5.back.notification.NotificacaoEmail;
 import com.trabalho_pratico_grpo5.back.notification.NotificacaoSMS;
 import com.trabalho_pratico_grpo5.back.notification.NotificacaoInterna;
 import com.trabalho_pratico_grpo5.back.repository.AluguelRepository;
- 
+import com.trabalho_pratico_grpo5.back.repository.QuartoRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
 import jakarta.annotation.PostConstruct;
 import java.util.List;
- 
+
 @Service
 public class AluguelService {
- 
+
     @Autowired
     private AluguelRepository aluguelRepository;
- 
+
+    @Autowired
+    private QuartoRepository quartoRepository;
+
     private GerenciadorDeNotificacoes gerenciador;
  
     @PostConstruct
@@ -42,13 +47,17 @@ public class AluguelService {
         if (aluguel.getDataFim().isBefore(aluguel.getDataInicio())) {
             throw new DataInvalidaException("Data de fim não pode ser anterior à data de início.");
         }
-        if (aluguel.getQuarto() != null && !aluguel.getQuarto().isDisponivel()) {
-            throw new QuartoIndisponivelException("O quarto selecionado não está disponível.");
-        }
         if (aluguel.getQuarto() != null) {
-            aluguel.getQuarto().setDisponivel(false);
+            Quarto quarto = quartoRepository.findById(aluguel.getQuarto().getId())
+                    .orElseThrow(() -> new RuntimeException("Quarto não encontrado com id: " + aluguel.getQuarto().getId()));
+            if (!quarto.isDisponivel()) {
+                throw new QuartoIndisponivelException("O quarto selecionado não está disponível.");
+            }
+            quarto.setDisponivel(false);
+            quartoRepository.save(quarto);
+            aluguel.setQuarto(quarto);
         }
- 
+
         Aluguel salvo = aluguelRepository.save(aluguel);
  
         gerenciador.notificarTodos("RESERVA_CRIADA",
