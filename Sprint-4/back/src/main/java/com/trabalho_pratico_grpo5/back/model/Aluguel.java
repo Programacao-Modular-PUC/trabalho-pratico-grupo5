@@ -17,6 +17,7 @@ public class Aluguel {
 
     private double valorTotal;
 
+    @Column(nullable = false)
     private boolean cancelado = false;
 
     @ManyToOne
@@ -27,10 +28,6 @@ public class Aluguel {
 
     @ManyToOne
     private Residencia residencia;
-
-    public void confirmarPagamento() {
-
-    }
 
     public void cancelar() {
         if (this.cancelado) {

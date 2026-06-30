@@ -22,14 +22,6 @@ public class Cliente {
 
     private String endereco;
 
-    public void autenticar() {
-
-    }
-
-    public void solicitarReserva() {
-
-    }
-
     public Long getId() {
         return id;
     }

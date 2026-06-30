@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 public class QuartoService {
 
@@ -24,9 +25,7 @@ public class QuartoService {
     }
 
     public List<Quarto> listarDisponiveis() {
-        return quartoRepository.findAll().stream()
-                .filter(Quarto::isDisponivel)
-                .collect(Collectors.toList());
+        return quartoRepository.findByDisponivel(true);
     }
  
     public List<Quarto> filtrarPorTipo(String tipo) {

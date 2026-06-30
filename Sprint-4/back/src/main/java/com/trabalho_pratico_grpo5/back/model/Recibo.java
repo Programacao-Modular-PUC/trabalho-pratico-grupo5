@@ -14,8 +14,14 @@ public class Recibo {
     @OneToOne
     private Aluguel aluguel;
 
-    public void imprimirRecibo() {
-
+    public String imprimirRecibo() {
+        if (aluguel == null) {
+            return "Recibo #" + idRecibo + " | Valor: R$ " + valorTotal;
+        }
+        return "Recibo #" + idRecibo
+                + " | Aluguel #" + aluguel.getId()
+                + " | Período: " + aluguel.getDataInicio() + " a " + aluguel.getDataFim()
+                + " | Valor: R$ " + valorTotal;
     }
 
     public Long getIdRecibo() {

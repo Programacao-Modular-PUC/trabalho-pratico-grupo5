@@ -19,14 +19,6 @@ public class Residencia {
     @OneToMany
     private List<Quarto> quartos;
 
-    public void reservar() {
-
-    }
-
-    public void calcularPreco() {
-
-    }
-
     public Long getId() {
         return id;
     }

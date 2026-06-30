@@ -23,10 +23,14 @@ public class ResidenciaService {
     }
 
     public Residencia buscarPorId(Long id) {
-        return residenciaRepository.findById(id).orElse(null);
+        return residenciaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Residência não encontrada com id: " + id));
     }
 
     public void deletar(Long id) {
+        if (!residenciaRepository.existsById(id)) {
+            throw new RuntimeException("Residência não encontrada com id: " + id);
+        }
         residenciaRepository.deleteById(id);
     }
 }
